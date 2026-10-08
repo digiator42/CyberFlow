@@ -1,0 +1,4 @@
+/backend/target/
+/backend/logs_soc.db
+/frontend/target/
+/frontend/dist/

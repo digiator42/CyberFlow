@@ -1,0 +1,16 @@
+[package]
+name = "logs-soc-backend"
+version = "0.1.0"
+edition = "2021"
+description = "Hybrid log aggregation + SOC threat-intelligence backend built on GritShield"
+
+[dependencies]
+gritshield = { path = "../../Gritshield", features = ["sqlite"] }
+tokio = { version = "1.0", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sea-orm = { version = "1.1", features = ["runtime-tokio-native-tls", "sqlx-sqlite", "with-chrono"] }
+async-trait = "0.1"
+
+[profile.release]
+lto = true
