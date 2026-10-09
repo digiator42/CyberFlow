@@ -10,11 +10,23 @@ use web_sys::{Request, RequestInit};
 
 use crate::state::Threat;
 
+/// Backend base URL (dev). When served from the same origin as the API, this
+/// can stay empty.
+const BASE_URL: &str = "http://127.0.0.1:8010";
+
 /// Server-Sent Events feed of live log telemetry.
 pub const STREAM_PATH: &str = "/api/v1/stream";
 
 /// Threat incident ingestion (JSON POST).
 pub const THREATS_PATH: &str = "/api/v1/threats";
+
+fn with_base(path: &str) -> String {
+    if BASE_URL.is_empty() {
+        path.to_string()
+    } else {
+        format!("{}{}", BASE_URL.trim_end_matches('/'), path)
+    }
+}
 
 /// API key expected by GritShield's `on_request` auth middleware.
 ///
@@ -25,10 +37,11 @@ pub const API_KEY: &str = "";
 
 /// Fully-qualified SSE URL including the auth query parameter.
 pub fn stream_url() -> String {
+    let url = with_base(STREAM_PATH);
     if API_KEY.is_empty() {
-        STREAM_PATH.to_string()
+        url
     } else {
-        format!("{STREAM_PATH}?api_key={API_KEY}")
+        format!("{url}?api_key={API_KEY}")
     }
 }
 
@@ -49,7 +62,7 @@ pub async fn post_threat(threat: &Threat) -> Result<(), String> {
     init.set_headers(&headers);
     init.set_body(&JsValue::from_str(&body));
 
-    let request = Request::new_with_str_and_init(THREATS_PATH, &init).map_err(|e| debug_js(&e))?;
+    let request = Request::new_with_str_and_init(&with_base(THREATS_PATH), &init).map_err(|e| debug_js(&e))?;
 
     // `fetch` lives on `Window` in web-sys, not on `Request`.
     let window = web_sys::window().ok_or("no window object")?;

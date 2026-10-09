@@ -51,8 +51,8 @@ pub fn connect(app: &AppState) {
     source.set_onerror(Some(on_error.as_ref().unchecked_ref()));
     on_error.forget();
 
-    // --- onmessage: decode JSON into the shared ingest pipeline ------------
-    let on_message = {
+    // 3. Listen specifically for "log" named events (NOT set_onmessage)
+    let on_log = {
         let app = app.clone();
         Closure::wrap(Box::new(move |event: web_sys::MessageEvent| {
             let Some(raw) = event.data().as_string() else {
@@ -66,8 +66,12 @@ pub fn connect(app: &AppState) {
             }
         }) as Box<dyn FnMut(web_sys::MessageEvent)>)
     };
-    source.set_onmessage(Some(on_message.as_ref().unchecked_ref()));
-    on_message.forget();
+
+    // Attach named event listener for "log"
+    if let Err(err) = source.add_event_listener_with_callback("log", on_log.as_ref().unchecked_ref()) {
+        web_sys::console::error_1(&format!("failed to register 'log' listener: {err:?}").into());
+    }
+    on_log.forget();
 
     SOURCE.with(|slot| *slot.borrow_mut() = Some(source));
 }
