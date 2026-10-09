@@ -14,7 +14,7 @@ Any deviations from the contract already sketched in `src/api.rs` are marked
 |------------|--------------------|-------------------|
 | Bind host  | `SOC_BIND`         | `127.0.0.1`       |
 | Port       | `SOC_PORT`         | `8010`            |
-| SQLite DSN | `SOC_DATABASE_URL` | `sqlite://logs_soc.db?mode=rwc` |
+| SQLite DSN | `DATABASE_URL`    | `sqlite://logs_soc.db?mode=rwc` |
 | API key    | `SOC_API_KEY`      | *(unset → open)*  |
 
 Run it:
