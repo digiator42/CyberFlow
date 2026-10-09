@@ -4,8 +4,14 @@ version = "0.1.0"
 edition = "2021"
 description = "Hybrid log aggregation + SOC threat-intelligence backend built on GritShield"
 
+[features]
+# Users default opt-in.
+default = ["sqlite", "mcp"]
+sqlite = ["gritshield/sqlite"]
+mcp = ["gritshield/mcp"]
+
 [dependencies]
-gritshield = { path = "../../Gritshield", features = ["sqlite"] }
+gritshield = { path = "../../Gritshield", default-features = false }
 tokio = { version = "1.0", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"

@@ -2,6 +2,7 @@ mod api;
 mod db;
 mod entities;
 mod logstore;
+#[cfg(feature = "mcp")]
 mod mcp;
 mod middleware;
 mod state;
