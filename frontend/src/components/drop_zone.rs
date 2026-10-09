@@ -22,7 +22,12 @@ pub fn DropZone() -> DomNode {
     let conn = app.conn;
     let drag = signal!(false);
 
-    let in_local = memo!(move || mode.get() == Mode::Local);
+    let in_local = signal!(mode.get() == Mode::Local);
+
+    effect!(move || {
+        in_local.set(mode.get() == Mode::Local);
+    });
+
     let drag_class = memo!(move || {
         if drag.get() {
             "dropzone drag-over".to_string()
@@ -58,76 +63,76 @@ pub fn DropZone() -> DomNode {
                 <h2 class="panel-title">"File Ingestion"</h2>
             </div>
 
-            <Show when={ in_local } fallback={
-                view! {
-                    <div class="stream-status">
-                        <span class={ conn_css }></span>
-                        <span class="conn-text">{ conn_label }</span>
-                        <code class="endpoint">{ endpoint }</code>
-                        <p class="stream-hint">
-                            "Live mode streams from GritShield. Switch to LOCAL FILE ANALYSIS to inspect captured log files offline."
-                        </p>
-                    </div>
-                }
-            }>
-                <div
-                    class={ drag_class }
-                    on:dragover={ move |ev: Event| {
-                        ev.prevent_default();
-                        drag.set(true);
-                    } }
-                    on:dragleave={ move |_| drag.set(false) }
-                    on:drop={ move |ev: Event| {
-                        ev.prevent_default();
-                        drag.set(false);
-                        if app_drop.analysis.active.get() {
-                            return;
-                        }
-                        let Some(de) = ev.dyn_ref::<web_sys::DragEvent>() else { return; };
-                        let Some(dt) = de.data_transfer() else { return; };
-                        let Some(files) = dt.files() else { return; };
-                        let Some(file) = files.get(0) else { return; };
-                        start_analysis(&app_drop, file);
-                    } }
-                >
-                    <Show when={ analyzing } fallback={
-                        view! {
-                            <div class="drop-hint">
-                                <div class="drop-icon">"⇩"</div>
-                                <div class="drop-title">"Drop log files here"</div>
-                                <div class="drop-sub">".log · .txt · .jsonl — parsed locally, nothing is uploaded"</div>
-                                <label class="browse-label">
-                                    "or click to browse"
-                                    <input
-                                        type="file"
-                                        class="file-input"
-                                        accept=".log,.txt,.jsonl"
-                                        on:change={ move |ev: Event| {
-                                            let Some(target) = ev.target() else { return; };
-                                            let Ok(input) = target.dyn_into::<web_sys::HtmlInputElement>() else { return; };
-                                            let Some(files) = input.files() else { return; };
-                                            let Some(file) = files.get(0) else { return; };
-                                            input.set_value("");
-                                            start_analysis(&app_browse, file);
-                                        } }
-                                    />
-                                </label>
-                            </div>
-                        }
-                    }>
-                        <div class="analysis">
-                            <div class="analysis-file">{ file_name }</div>
-                            <div class="progress-track">
-                                <div class="progress-fill" style={ bar_style }></div>
-                            </div>
-                            <div class="analysis-meta">
-                                <span class="analysis-pct">{ progress_label }</span>
-                                <span class="analysis-lines">{ lines_label } " lines parsed"</span>
-                            </div>
+            <div
+                class="stream-status"
+                style:display={ move || if in_local.get() { "none".to_string() } else { "flex".to_string() } }
+            >
+                <span class={ conn_css }></span>
+                <span class="conn-text">{ conn_label }</span>
+                <code class="endpoint">{ endpoint }</code>
+                <p class="stream-hint">
+                    "Live mode streams from GritShield. Switch to LOCAL FILE ANALYSIS to inspect captured log files offline."
+                </p>
+            </div>
+
+            <div
+                class={ drag_class }
+                style:display={ move || if in_local.get() { "flex".to_string() } else { "none".to_string() } }
+                on:dragover={ move |ev: Event| {
+                    ev.prevent_default();
+                    drag.set(true);
+                } }
+                on:dragleave={ move |_| drag.set(false) }
+                on:drop={ move |ev: Event| {
+                    ev.prevent_default();
+                    drag.set(false);
+                    if app_drop.analysis.active.get() {
+                        return;
+                    }
+                    let Some(de) = ev.dyn_ref::<web_sys::DragEvent>() else { return; };
+                    let Some(dt) = de.data_transfer() else { return; };
+                    let Some(files) = dt.files() else { return; };
+                    let Some(file) = files.get(0) else { return; };
+                    start_analysis(&app_drop, file);
+                } }
+            >
+                <Show when={ analyzing } fallback={
+                    view! {
+                        <div class="drop-hint">
+                            <div class="drop-icon">"⇩"</div>
+                            <div class="drop-title">"Drop log files here"</div>
+                            <div class="drop-sub">".log · .txt · .jsonl — parsed locally, nothing is uploaded"</div>
+                            <label class="browse-label">
+                                "or click to browse"
+                                <input
+                                    type="file"
+                                    class="file-input"
+                                    accept=".log,.txt,.jsonl"
+                                    on:change={ move |ev: Event| {
+                                        let Some(target) = ev.target() else { return; };
+                                        let Ok(input) = target.dyn_into::<web_sys::HtmlInputElement>() else { return; };
+                                        let Some(files) = input.files() else { return; };
+                                        let Some(file) = files.get(0) else { return; };
+                                        input.set_value("");
+                                        start_analysis(&app_browse, file);
+                                    } }
+                                />
+                            </label>
                         </div>
-                    </Show>
-                </div>
-            </Show>
+                    }
+                }>
+                    <div class="analysis">
+                        <div class="analysis-file">{ file_name }</div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style={ bar_style }></div>
+                        </div>
+                        <div class="analysis-meta">
+                            <span class="analysis-pct">{ progress_label }</span>
+                            <span class="analysis-lines">{ lines_label } " lines parsed"</span>
+                        </div>
+                    </div>
+                </Show>
+            </div>
         </section>
     }
 }

