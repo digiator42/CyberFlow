@@ -59,6 +59,9 @@ async fn main() {
     let router = Router::new()
         .mount_logger(LogLevel::Debug)
         .mount_db(shared_db)
+        .add_middleware(gritshield::middleware::CorsMiddleware::new(vec![
+            "*".to_string(),
+        ]))
         .add_middleware(ApiKeyMiddleware::new(app_state.clone()))
         .add_middleware(IpBlacklistMiddleware::new(app_state.clone()))
         .add_middleware(BodyLimitMiddleware::new(512 * 1024)) // 512 KiB; framework caps the whole request at 1 MiB
