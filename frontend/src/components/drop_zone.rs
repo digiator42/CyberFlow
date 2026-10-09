@@ -108,9 +108,11 @@ pub fn DropZone() -> DomNode {
                                         class="file-input"
                                         accept=".log,.txt,.jsonl"
                                         on:change={ move |ev: Event| {
-                                            let Some(input) = ev.dyn_ref::<web_sys::HtmlInputElement>() else { return; };
+                                            let Some(target) = ev.target() else { return; };
+                                            let Ok(input) = target.dyn_into::<web_sys::HtmlInputElement>() else { return; };
                                             let Some(files) = input.files() else { return; };
                                             let Some(file) = files.get(0) else { return; };
+                                            input.set_value("");
                                             start_analysis(&app_browse, file);
                                         } }
                                     />
