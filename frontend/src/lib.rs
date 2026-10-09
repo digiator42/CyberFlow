@@ -25,6 +25,7 @@ mod detection;
 mod ingest;
 mod net;
 mod state;
+mod worker;
 
 use crate::components::*;
 use crate::state::AppState;
@@ -32,6 +33,12 @@ use crate::state::AppState;
 #[wasm_bindgen(start)]
 pub fn main() {
     console_error_panic_hook::set_once();
+    // The same wasm module is instantiated inside the analysis Web Worker.
+    // There is no `window` there, so skip mounting the dashboard; the worker
+    // is driven by the `worker::worker_*` entry points instead.
+    if web_sys::window().is_none() {
+        return;
+    }
     run_app();
 }
 

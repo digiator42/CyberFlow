@@ -77,7 +77,7 @@ pub fn ThreatPanel() -> DomNode {
     let flag_threats = app.threats.clone();
     let for_threats = app.threats.clone();
     let count = memo!(move || format!("{}", count_threats.len()));
-    let has_threats = memo!(move || flag_threats.len() > 0);
+    let is_empty = memo!(move || flag_threats.len() == 0);
 
     view! {
         <section class="panel threats">
@@ -87,16 +87,18 @@ pub fn ThreatPanel() -> DomNode {
             </div>
 
             <div class="threat-list">
-                <Show when={ has_threats }
-                      fallback={ view! { <div class="threat-empty">"No threats detected. Signals and rate checks are armed."</div> } }>
-                    <div class="threat-items">
-                        {
-                            for t in for_threats key = |t: &Threat| t.id {
-                                <ThreatCard threat={ t.clone() } />
-                            }
-                        }
-                    </div>
-                </Show>
+                {
+                    move || if is_empty.get() {
+                        view! { <div class="threat-empty">"No threats detected. Signals and rate checks are armed."</div> }
+                    } else {
+                        DomNode::empty()
+                    }
+                }
+                {
+                    for t in for_threats key = |t: &Threat| t.id {
+                        <ThreatCard threat={ t.clone() } />
+                    }
+                }
             </div>
         </section>
     }

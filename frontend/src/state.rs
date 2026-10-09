@@ -57,7 +57,7 @@ pub const TOAST_TTL_MS: u32 = 6_000;
 ///
 /// Missing fields fall back to defaults so a noisy upstream producer can never
 /// break the dashboard — an event without `ip`/`route` simply renders blank.
-#[derive(Clone, Debug, Default, Deserialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct LogEvent {
     /// Epoch milliseconds. `0` means "assign on ingest".

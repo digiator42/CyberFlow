@@ -6,25 +6,64 @@
 //! bumps the hot-path metric counters.
 
 use crate::api;
-use crate::detection::Detection as DetectionHit;
+use crate::detection::RuleHit;
 use crate::state::{
     AppState, LogEntry, LogEvent, LogLevel, Threat, RAW_KEEP, RAW_TRIM_AT, THREAT_KEEP, TOAST_KEEP,
     TOAST_TTL_MS,
 };
 
-/// Run one batch of events through detection + state.
+/// Run one batch of events through detection + state on the main thread.
 ///
 /// `origin` attributes the batch (`"live"` or `"file:<name>"`) and is stamped
-/// onto every row and threat it produces.
+/// onto every row and threat it produces. Used by the SSE stream; file
+/// ingestion instead offloads detection to a Web Worker and calls
+/// [`ingest_precomputed`].
 pub fn ingest_events(app: &AppState, origin: &str, events: Vec<LogEvent>) {
     if events.is_empty() {
         return;
     }
 
-    // ---- 0. Stamp missing timestamps up-front so detection (rate windows)
-    //         and the terminal both see real times. `js_sys::Date::now()` is
-    //         only called on wasm; host-side unit tests never touch it.
-    let events: Vec<LogEvent> = events
+    let events = stamp_timestamps(events);
+
+    // Detect (borrow the detector once for the whole batch).
+    let mut hits: Vec<RuleHit> = Vec::new();
+    {
+        let mut detector = app.detector.borrow_mut();
+        for (index, ev) in events.iter().enumerate() {
+            for hit in detector.inspect(ev) {
+                hits.push(RuleHit {
+                    index,
+                    rule_id: hit.rule_id.to_string(),
+                    title: hit.title.to_string(),
+                    severity: hit.severity,
+                });
+            }
+        }
+    }
+
+    apply(app, origin, events, hits);
+}
+
+/// Apply a batch whose detection already happened elsewhere (the Web Worker).
+///
+/// `events` must already carry real timestamps and `hits` must index into it.
+pub fn ingest_precomputed(
+    app: &AppState,
+    origin: &str,
+    events: Vec<LogEvent>,
+    hits: Vec<RuleHit>,
+) {
+    if events.is_empty() {
+        return;
+    }
+    apply(app, origin, events, hits);
+}
+
+/// Stamp wall-clock time onto events that arrived without one, so detection
+/// (rate windows) and the terminal both see real times. `js_sys::Date::now()`
+/// is only called on wasm; host-side unit tests never reach this path.
+fn stamp_timestamps(events: Vec<LogEvent>) -> Vec<LogEvent> {
+    events
         .into_iter()
         .map(|mut ev| {
             if ev.ts <= 0.0 {
@@ -32,31 +71,23 @@ pub fn ingest_events(app: &AppState, origin: &str, events: Vec<LogEvent>) {
             }
             ev
         })
-        .collect();
+        .collect()
+}
 
-    // ---- 1. Detect (borrow the detector once for the whole batch) --------
-    let mut flagged: Vec<(LogEvent, DetectionHit)> = Vec::new();
-    {
-        let mut detector = app.detector.borrow_mut();
-        for ev in &events {
-            for hit in detector.inspect(ev) {
-                flagged.push((ev.clone(), hit));
-            }
-        }
-    }
-
-    // ---- 2. Append terminal rows in one notification ----------------------
+/// Shared tail of every ingestion path: append terminal rows, bump counters,
+/// and promote detections to threat incidents.
+fn apply(app: &AppState, origin: &str, events: Vec<LogEvent>, hits: Vec<RuleHit>) {
     let count = events.len() as u32;
     app.logs.with_mut(|v| {
-        for ev in events {
+        for ev in &events {
             let level = LogLevel::parse(&ev.level);
             let haystack = format!("{} {} {}", ev.ip, ev.route, ev.msg).to_ascii_lowercase();
             v.push(LogEntry {
                 id: app.metrics.next_row_id(),
                 ts_ms: ev.ts,
                 level,
-                ip: ev.ip,
-                route: ev.route,
+                ip: ev.ip.clone(),
+                route: ev.route.clone(),
                 msg: crate::state::truncate_chars(&ev.msg, 500),
                 source: origin.to_string(),
                 haystack,
@@ -73,16 +104,18 @@ pub fn ingest_events(app: &AppState, origin: &str, events: Vec<LogEvent>) {
         .window_logs
         .set(app.metrics.window_logs.get().saturating_add(count));
 
-    // ---- 3. Promote detections to threat incidents ------------------------
-    for (ev, hit) in flagged {
+    for hit in hits {
+        let Some(ev) = events.get(hit.index) else {
+            continue;
+        };
         raise_threat(
             app,
             Threat {
                 id: app.metrics.next_row_id(),
                 ts_ms: ev.ts,
                 severity: hit.severity,
-                rule_id: hit.rule_id.to_string(),
-                rule_name: hit.title.to_string(),
+                rule_id: hit.rule_id,
+                rule_name: hit.title,
                 ip: ev.ip.clone(),
                 payload: crate::state::truncate_chars(&ev.msg, 200),
                 origin: origin.to_string(),

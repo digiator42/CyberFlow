@@ -55,6 +55,18 @@ pub struct Detection {
     pub severity: Severity,
 }
 
+/// Wire form of a [`Detection`], carrying the index of the offending event in
+/// its batch. The Web Worker posts batches of these back to the main thread,
+/// so every field is owned and the type is (de)serializable.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct RuleHit {
+    /// Index into the batch's `events` vector.
+    pub index: usize,
+    pub rule_id: String,
+    pub title: String,
+    pub severity: Severity,
+}
+
 /// Stateful detector: signature + entropy checks are stateless, but the
 /// sliding-window rate check needs to remember per-IP history between events.
 pub struct Detector {

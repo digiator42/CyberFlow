@@ -48,11 +48,23 @@ pub fn looks_obfuscated(s: &str) -> bool {
 }
 
 /// Screen a payload; returns at most one entropy finding.
+///
+/// A raw log line contains whitespace, so the whole line never looks like a
+/// blob. We therefore also split the line into candidate tokens (path segments,
+/// query values, quoted strings, command args) and test each one.
 pub fn check(payload: &str) -> Vec<Detection> {
-    // Trim surrounding quotes/whitespace first — a JSON-encoded blob still
-    // counts even though the envelope has a little structure.
+    // Whole payload first - a JSON-encoded blob still counts even though the
+    // envelope has a little structure.
     let trimmed = payload.trim().trim_matches('"');
-    if looks_obfuscated(trimmed) {
+    let hit = looks_obfuscated(trimmed)
+        || payload
+            .split(|c: char| {
+                c.is_whitespace()
+                    || matches!(c, '"' | '\'' | '=' | '&' | ',' | ';' | '(' | ')' | '[' | ']')
+            })
+            .any(looks_obfuscated);
+
+    if hit {
         vec![Detection {
             rule_id: "entropy.obfuscated",
             title: "High-entropy payload (possible encoded shell)",
@@ -107,5 +119,21 @@ mod tests {
     #[test]
     fn ignores_short_payloads() {
         assert!(!looks_obfuscated("aGVsbG8gd29ybGQ="));
+    }
+
+    #[test]
+    fn detects_base64_token_inside_a_real_log_line() {
+        let blob: String = (0..200u32)
+            .map(|i| {
+                const ALPHABET: &[u8] =
+                    b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+                ALPHABET[((i.wrapping_mul(40503)) >> 3) as usize % 64] as char
+            })
+            .collect();
+        let line = format!(
+            "198.51.100.10 - - [08/Oct/2026:12:00:01] \"GET /exfil?data={blob} HTTP/1.1\" 200 512"
+        );
+        let hits = check(&line);
+        assert!(hits.iter().any(|h| h.rule_id == "entropy.obfuscated"));
     }
 }
