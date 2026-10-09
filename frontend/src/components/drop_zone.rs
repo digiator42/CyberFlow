@@ -22,11 +22,7 @@ pub fn DropZone() -> DomNode {
     let conn = app.conn;
     let drag = signal!(false);
 
-    let in_local = signal!(mode.get() == Mode::Local);
-
-    effect!(move || {
-        in_local.set(mode.get() == Mode::Local);
-    });
+    let in_local = memo!(move || mode.get() == Mode::Local);
 
     let drag_class = memo!(move || {
         if drag.get() {

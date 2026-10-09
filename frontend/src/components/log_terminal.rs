@@ -7,6 +7,7 @@
 //! `VISIBLE_TRIM_AT`).
 
 use velo::prelude::*;
+use wasm_bindgen::JsCast;
 
 use crate::state::{format_time, AppState, LogEntry};
 
@@ -15,8 +16,11 @@ use crate::state::{format_time, AppState, LogEntry};
 /// closures and must not borrow the loop variable.
 #[component]
 pub fn LogRow(entry: LogEntry) -> DomNode {
-    // Each local below is captured by exactly one `move` closure in the view
-    // (or consumed by `class=`), so no clone-per-use is needed.
+    let app = use_context::<AppState>().expect("AppState must be provided before mounting");
+    let entry_clone = entry.clone();
+    let selected = app.selected_log;
+    let entry_id = entry.id;
+
     let row_class = class_names!("log-row", entry.level.css());
     let time = format_time(entry.ts_ms);
     let level_class = class_names!("log-level", format!("lvl-{}", entry.level.css()));
@@ -36,11 +40,89 @@ pub fn LogRow(entry: LogEntry) -> DomNode {
     let msg = entry.msg;
 
     view! {
-        <div class={ row_class } title={ source }>
+        <div
+            class={ row_class }
+            class:log-row-selected={ move || selected.get().as_ref().map(|e| e.id) == Some(entry_id) }
+            title={ source }
+            on:click={ move |_| {
+                selected.set(Some(entry_clone.clone()));
+            } }
+        >
             <span class="log-time">{ time }</span>
             <span class={ level_class }>{ level_text }</span>
             <span class="log-meta">{ meta }</span>
             <span class="log-msg">{ msg }</span>
+        </div>
+    }
+}
+
+/// Log detail panel showing full information for selected log entry.
+#[component]
+pub fn LogDetail() -> DomNode {
+    let app = use_context::<AppState>().expect("AppState must be provided before mounting");
+    let selected = app.selected_log;
+
+    view! {
+        <div
+            class="log-detail-overlay"
+            style:display={ move || if selected.get().is_some() { "flex".to_string() } else { "none".to_string() } }
+            on:click={ move |_| selected.set(None) }
+        >
+            <div class="log-detail-panel" on:click={ move |ev| {
+                let ev = ev.dyn_ref::<web_sys::Event>().unwrap();
+                ev.stop_propagation();
+            }}>
+                {
+                    move || {
+                        if let Some(entry) = selected.get() {
+                            let time = format_time(entry.ts_ms);
+                            let level_text = entry.level.as_str().to_string();
+                            let ip = if entry.ip.is_empty() { "-".to_string() } else { entry.ip.clone() };
+                            let route = if entry.route.is_empty() { "-".to_string() } else { entry.route.clone() };
+
+                            view! {
+                                <div class="log-detail-content">
+                                    <div class="log-detail-header">
+                                        <h3 class="log-detail-title">"Log Details"</h3>
+                                        <button
+                                            class="log-detail-close"
+                                            on:click={ move |_| selected.set(None) }
+                                        >"×"</button>
+                                    </div>
+                                    <div class="log-detail-body">
+                                        <div class="log-detail-row">
+                                            <span class="log-detail-label">"Timestamp:"</span>
+                                            <span class="log-detail-value">{ time }</span>
+                                        </div>
+                                        <div class="log-detail-row">
+                                            <span class="log-detail-label">"Level:"</span>
+                                            <span class={ format!("log-detail-value log-level lvl-{}", entry.level.css()) }>{ level_text }</span>
+                                        </div>
+                                        <div class="log-detail-row">
+                                            <span class="log-detail-label">"Source IP:"</span>
+                                            <span class="log-detail-value">{ ip }</span>
+                                        </div>
+                                        <div class="log-detail-row">
+                                            <span class="log-detail-label">"Route:"</span>
+                                            <span class="log-detail-value">{ route }</span>
+                                        </div>
+                                        <div class="log-detail-row">
+                                            <span class="log-detail-label">"Source:"</span>
+                                            <span class="log-detail-value">{ entry.source.clone() }</span>
+                                        </div>
+                                        <div class="log-detail-row log-detail-row-full">
+                                            <span class="log-detail-label">"Message:"</span>
+                                            <pre class="log-detail-msg">{ entry.msg.clone() }</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        } else {
+                            view! { <div></div> }
+                        }
+                    }
+                }
+            </div>
         </div>
     }
 }

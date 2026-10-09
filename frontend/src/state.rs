@@ -275,6 +275,7 @@ pub struct AppState {
     pub filter_level: RwSignal<Option<LogLevel>>,
     pub filter_query: RwSignal<String>,
     pub auto_scroll: RwSignal<bool>,
+    pub selected_log: RwSignal<Option<LogEntry>>,
 
     pub threats: SignalVec<Threat>,
     /// Ephemeral flash alerts (auto-dismissed after [`TOAST_TTL_MS`]).
@@ -309,6 +310,7 @@ impl AppState {
             filter_level: signal!(Option::<LogLevel>::None),
             filter_query: signal!(String::new()),
             auto_scroll: signal!(true),
+            selected_log: signal!(None),
             threats: signal_vec(Vec::new()),
             toasts: signal_vec(Vec::new()),
             metrics,

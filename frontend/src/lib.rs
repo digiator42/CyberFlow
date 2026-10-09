@@ -68,6 +68,7 @@ pub fn run_app() {
             </main>
 
             <ToastStack />
+            <LogDetail />
         </div>
     };
     mount(shell);
