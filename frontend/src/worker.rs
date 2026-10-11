@@ -20,7 +20,7 @@
 use std::cell::RefCell;
 
 use serde::{Deserialize, Serialize};
-use velo::prelude::*;
+use veloasm::prelude::*;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::JsFuture;
@@ -460,3 +460,4 @@ mod tests {
         assert_eq!(out, vec!["\n", "\n"]);
     }
 }
+

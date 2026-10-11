@@ -7,7 +7,7 @@
 //! responsive on multi-hundred-MB captures: only one chunk is ever in flight,
 //! and all CPU-heavy work happens on the worker.
 
-use velo::prelude::*;
+use veloasm::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::Event;
 
@@ -138,3 +138,4 @@ pub fn DropZone() -> DomNode {
 fn start_analysis(app: &AppState, file: web_sys::File) {
     worker::spawn_analysis(app, file);
 }
+

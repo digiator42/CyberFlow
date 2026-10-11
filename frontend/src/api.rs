@@ -46,7 +46,7 @@ pub fn stream_url() -> String {
 /// Fire-and-forget from the UI's perspective: the dashboard keeps working
 /// (and the incident stays visible locally) even when the backend is down.
 pub async fn post_threat(threat: &Threat) -> Result<(), String> {
-    velo::request(&with_base(THREATS_PATH))
+    veloasm::request(&with_base(THREATS_PATH))
         .method("POST")
         .json_body(threat)
         .map_err(|e| e.to_string())?
@@ -55,3 +55,4 @@ pub async fn post_threat(threat: &Threat) -> Result<(), String> {
         .map(|_| ())
         .map_err(|e| e.to_string())
 }
+

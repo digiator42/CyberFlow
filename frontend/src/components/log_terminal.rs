@@ -6,7 +6,7 @@
 //! and the DOM is trimmed in batches rather than per-push (see
 //! `VISIBLE_TRIM_AT`).
 
-use velo::prelude::*;
+use veloasm::prelude::*;
 use wasm_bindgen::JsCast;
 
 use crate::state::{format_time, AppState, LogEntry};
@@ -185,3 +185,4 @@ fn scroll_to_bottom() {
         el.set_scroll_top(el.scroll_height());
     }
 }
+

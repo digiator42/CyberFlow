@@ -1,7 +1,7 @@
 //! Interactive control panel: ingest-mode toggle, log filters, and viewport
 //! controls.
 
-use velo::prelude::*;
+use veloasm::prelude::*;
 
 use crate::net;
 use crate::state::{AppState, LogLevel, Mode};
@@ -110,3 +110,4 @@ pub fn ControlPanel() -> DomNode {
         </section>
     }
 }
+

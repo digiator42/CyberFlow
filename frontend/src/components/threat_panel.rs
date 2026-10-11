@@ -1,6 +1,6 @@
 //! Threat intelligence side panel + flash-alert toast stack.
 
-use velo::prelude::*;
+use veloasm::prelude::*;
 
 use crate::ingest;
 use crate::state::{format_time, AppState, Threat};
@@ -120,3 +120,4 @@ pub fn ToastStack() -> DomNode {
         </div>
     }
 }
+

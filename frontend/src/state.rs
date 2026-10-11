@@ -19,7 +19,7 @@ use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
 use serde::{Deserialize, Serialize};
-use velo::prelude::*;
+use veloasm::prelude::*;
 
 use crate::detection::{Detector, Severity};
 
@@ -407,3 +407,4 @@ pub fn format_time(ts_ms: f64) -> String {
 pub fn truncate_chars(s: &str, max: usize) -> String {
     s.chars().take(max).collect()
 }
+

@@ -1,6 +1,6 @@
 //! Header bar: brand mark + live stream status.
 
-use velo::prelude::*;
+use veloasm::prelude::*;
 
 use crate::state::AppState;
 
@@ -36,3 +36,4 @@ pub fn TopBar() -> DomNode {
         </header>
     }
 }
+

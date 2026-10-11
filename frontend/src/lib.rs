@@ -1,7 +1,7 @@
 //! `examples/gritshield-soc` — GritShield SOC, a hybrid live log stream and
 //! privacy-preserving client-side threat analysis console.
 //!
-//! One codebase exercising Velo features end-to-end:
+//! One codebase exercising veloasm features end-to-end:
 //!
 //! - SSE live feed (`EventSource` bridge in [`net`]) feeding a keyed `for`
 //!   terminal that holds up under the 100+ events/sec verification target
@@ -16,7 +16,7 @@
 //!
 //! Backend endpoints are stubbed in [`api`] pending GritShield API docs.
 
-use velo::prelude::*;
+use veloasm::prelude::*;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 mod api;
@@ -73,3 +73,4 @@ pub fn run_app() {
     };
     mount(shell);
 }
+

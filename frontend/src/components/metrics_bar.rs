@@ -1,7 +1,7 @@
 //! Real-time metrics strip: throughput, threat count, and a rolling
 //! logs/sec sparkline chart.
 
-use velo::prelude::*;
+use veloasm::prelude::*;
 
 use crate::state::AppState;
 
@@ -79,3 +79,4 @@ pub fn MetricsBar() -> DomNode {
         </section>
     }
 }
+
